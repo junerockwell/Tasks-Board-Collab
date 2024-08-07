@@ -30,6 +30,9 @@ function generateTaskId() {
 // WHAT IS THIS FUNCTION DOING?  This function should create an HTML card element for a given task object
 function createTaskCard(task) {
     console.log('inside createTaskCard() with data passed: ', task)
+    
+    const taskDueDate = dayjs(task.dueDate).format('MM/DD/YYYY');
+    console.log('formatted date: ', taskDueDate)
     // TODO: create card elements (HINT: Module 5, Mini Project SOLVED, script.js, lines 37-67)
         //Example: 
         const taskCard = $('<div>')
@@ -38,7 +41,7 @@ function createTaskCard(task) {
         const cardHeader = $('<div>').addClass('card-header h4').text(task.title);
         const cardBody = $('<div>').addClass('card-body');
         const cardDescription = $('<p>').addClass('card-text').text(task.description);
-        const cardDueDate = $('<p>').addClass('card-text').text(task.dueDate);
+        const cardDueDate = $('<p>').addClass('card-text').text(taskDueDate);
         const cardDeleteBtn = $('<button>')
             .addClass('btn btn-danger delete')
             .text('Delete')
@@ -63,9 +66,12 @@ function createTaskCard(task) {
         cardBody.append(cardDueDate, cardDescription, cardDeleteBtn);
         taskCard.append(cardHeader, cardBody);
 
+        const todoCardsColumn = $('#todo-cards');
+        todoCardsColumn.append(taskCard);
     // TODO: return the card so it can be appended to the correct lane. 
-    const todoCardsColumn = $('#todo-cards');
-    todoCardsColumn.append(taskCard);
+   
+
+    return taskCard;
 
 }
 
@@ -91,9 +97,9 @@ function renderTaskList() {
           for (let task of taskList) {
         if (task.status === 'todo') {
             todoList.append(createTaskCard(task));
-          } else if (project.status === 'in-progress') {
+          } else if (task.status === 'in-progress') {
             inProgressList.append(createTaskCard(task));
-          } else if (project.status === 'done') {
+          } else if (task.status === 'done') {
             doneList.append(createTaskCard(task));
           }
         }
