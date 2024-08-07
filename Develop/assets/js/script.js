@@ -212,15 +212,34 @@ function handleDeleteTask(event){
 function handleDrop(event, ui) {
     // TODO: get the task id and new status from the event
         // Example: 
-        // const taskId = ui.draggable[0].dataset.projectId;
-        // const newStatus = event.target.id;
+        // Get the card that was dragged and dropped
+        // const taskId = ui.draggable[0].dataset.projectId; // <-- Teacher suggestion but I decided not to use data-set-projectid when the card was made in createTaskCard()
+        const draggableTaskCardId = ui.draggable.attr("id");
+        console.log('draggableTaskCardId: ', draggableTaskCardId);
+        
+        // Get the column id that the card was dropped to.
+        const droppaleColumnId = event.target.id;
+        console.log('droppaleColumnId: ', droppaleColumnId);
+        // It just so happens that the droppableColumnId can be
+        // used as the status text needed to be saved in 
+        // localStorage
+        console.log('newStatus: ', droppaleColumnId);
+        
+        // Using jQuery to get the specific card element by it's id
+        const droppedElement = $(`#${draggableTaskCardId}`); 
+        // Appending the dropped card element to the column element
+        // will remove it from the previous column to the
+        // dropped column
+        droppedElement.appendTo(`#${droppaleColumnId}-cards`);
+        // Update the column that the card is now in
+        droppedElement.attr('data-column', droppaleColumnId); // Do we still need this?
 
     //TODO: write a for...of loop to update the task status of the dragged card 
         // Example: 
-        // for (let project of projects) {
-        // if (project.id === taskId) {
-        //     project.status = newStatus;
-        //   }
+        // for (let task of taskList) {
+        //     if (task.id === draggableTaskCardId) {
+        //         task.status = droppaleColumnId;
+        //     }
         // }
 
     // TODO: save to local storage 
@@ -246,20 +265,14 @@ $(document).ready(function () {
 
     
     // TODO: make lanes droppable 
-    $("#to-do").droppable({
+    $("#todo").droppable({
         classes: {
           "ui-droppable-active": "ui-state-active",
           "ui-droppable-hover": "ui-state-hover"
         },
         drop: function( event, ui ) {
             console.log('the card data that was just dropped: ', ui);
-          const draggableId = ui.draggable.attr("id");
-          console.log('draggableId: ', draggableId);
-          const droppableId = $(this).attr("id");
-          console.log('droppableId: ', droppableId);
-          const droppedElement = $(`#${draggableId}`); 
-          droppedElement.appendTo("#todo-cards");
-          droppedElement.attr('data-column', 'to-do');
+            handleDrop(event, ui);
         }
       });
 
@@ -267,13 +280,14 @@ $(document).ready(function () {
         drop: function(event, ui) {
         //   console.log('event.target: ', event.target);
           console.log('the card data that was just dropped: ', ui);
-          const draggableId = ui.draggable.attr("id");
-          console.log('draggableId: ', draggableId); // Get the card that was dragged and dropped
-          const droppableId = $(this).attr("id");
-          console.log('droppableId: ', droppableId);
-          const droppedElement = $(`#${draggableId}`); // Get the column id that the card was dropped to.
-          droppedElement.appendTo("#in-progress-cards");
-          droppedElement.attr('data-column', 'in-progress'); // Update the column that the card is now in
+          handleDrop(event, ui);
+        //   const draggableId = ui.draggable.attr("id");
+        //   console.log('draggableId: ', draggableId); // Get the card that was dragged and dropped
+        //   const droppableId = $(this).attr("id");
+        //   console.log('droppableId: ', droppableId);
+        //   const droppedElement = $(`#${draggableId}`); // Get the column id that the card was dropped to.
+        //   droppedElement.appendTo("#in-progress-cards");
+        //   droppedElement.attr('data-column', 'in-progress'); // Update the column that the card is now in
         }
       });
 
@@ -284,13 +298,7 @@ $(document).ready(function () {
         },
         drop: function( event, ui ) {
             console.log('the card data that was just dropped: ', ui);
-          const draggableId = ui.draggable.attr("id");
-          console.log('draggableId: ', draggableId);
-          const droppableId = $(this).attr("id");
-          console.log('droppableId: ', droppableId);
-          const droppedElement = $(`#${draggableId}`);
-          droppedElement.appendTo("#done-cards");
-          droppedElement.attr('data-column', 'done-cards');
+          handleDrop(event, ui);
         }
       });
 });
