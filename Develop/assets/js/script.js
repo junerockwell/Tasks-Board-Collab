@@ -31,14 +31,14 @@ function generateTaskId() {
 function createTaskCard(task) {
     console.log('inside createTaskCard() with data passed: ', task)
     
+   
     const taskDueDate = dayjs(task.dueDate).format('MM/DD/YYYY');
-    console.log('formatted date: ', taskDueDate)
+    // console.log('formatted date: ', taskDueDate)
     // TODO: create card elements (HINT: Module 5, Mini Project SOLVED, script.js, lines 37-67)
         //Example: 
         const taskCard = $('<div>')
               .addClass('card project-card draggable my-3')
-              .attr('id', task.id)
-              .attr('data-column', 'to-do');
+              .attr('id', task.id);
         const cardHeader = $('<div>').addClass('card-header h4').text(task.title);
         const cardBody = $('<div>').addClass('card-body');
         const cardDescription = $('<p>').addClass('card-text').text(task.description);
@@ -51,63 +51,30 @@ function createTaskCard(task) {
 
     // TODO: set card background color based on due date
         // Example: 
-        // if (project.dueDate && project.status !== 'done') {
-        // const now = dayjs();
-        // const taskDueDate = dayjs(project.dueDate, 'DD/MM/YYYY');
-        // if (now.isSame(taskDueDate, 'day')) {
-        //   taskCard.addClass('bg-warning text-white');
-        // } else if (now.isAfter(taskDueDate)) {
-        //   taskCard.addClass('bg-danger text-white');
-        //   cardDeleteBtn.addClass('border-light');
-        // }
-        //   }
+        if (task.dueDate && task.status !== 'done') {
+            const now = dayjs();
+            // console.log('now: ', now)
+            const taskDueDate = dayjs(task.dueDate, 'DD/MM/YYYY');
+            if (now.isSame(taskDueDate, 'day')) {
+                // console.log('same day')
+                taskCard.addClass('bg-warning text-white');
+            } else if (now.isAfter(taskDueDate)) {
+                // console.log('after due date')
+                taskCard.addClass('bg-danger text-white');
+                cardDeleteBtn.addClass('border-light');
+            }
+        }
 
     // TODO: append card elements
         // Example: 
         cardBody.append(cardDueDate, cardDescription, cardDeleteBtn);
         taskCard.append(cardHeader, cardBody);
 
+        console.log(`appending ${task.title} with status ${task.status} to do column`)
         const todoCardsColumn = $('#todo-cards');
         todoCardsColumn.append(taskCard);
-    // TODO: return the card so it can be appended to the correct lane. 
-   
-
-    return taskCard;
-
-}
-
-// Todo: create a function to render the task list and make cards draggable
-// WHAT IS THIS FUNCTION DOING? This function should render all the task cards in their respective lanes &&  make them draggable using jQuery UI
-function renderTaskList() {
-    console.log("renderTaskList()")
-    // TODO: write an if/else statement where IF taskList is null, set it to an empty array
-
-    // TODO: empty existing task cards   
-        // Example: 
-        const todoList = $('#todo-cards');
-        // todoList.empty(); // no need 
-
-        const inProgressList = $('#in-progress-cards');
-        // inProgressList.empty(); // no need 
-
-        const doneList = $('#done-cards');
-        // doneList.empty(); // no need 
-
-    // TODO: loop through tasks and create task cards for each status 
-        // Example: 
-          for (let task of taskList) {
-        if (task.status === 'todo') {
-            todoList.append(createTaskCard(task));
-          } else if (task.status === 'in-progress') {
-            inProgressList.append(createTaskCard(task));
-          } else if (task.status === 'done') {
-            doneList.append(createTaskCard(task));
-          }
-        }
-
-    // TODO: use JQuery UI to make task cards draggable
-        // Example: 
-        $('.draggable').draggable({
+  
+    $('.draggable').draggable({
         opacity: 0.7,
         zIndex: 100,
         // snap: true,
@@ -133,6 +100,65 @@ function renderTaskList() {
             });
           },
         });
+
+    return taskCard;
+}
+
+// Todo: create a function to render the task list and make cards draggable
+// WHAT IS THIS FUNCTION DOING? This function should render all the task cards in their respective lanes &&  make them draggable using jQuery UI
+function renderTaskList() {
+    console.log("renderTaskList()")
+    // TODO: write an if/else statement where IF taskList is null, set it to an empty array
+    if (taskList === null) {
+        taskList = [];
+    }
+    // TODO: empty existing task cards   
+        // Example: 
+        const todoList = $('#todo-cards');
+        todoList.empty(); 
+
+        const inProgressList = $('#in-progress-cards');
+        inProgressList.empty(); 
+
+        const doneList = $('#done-cards');
+        doneList.empty(); 
+
+    // TODO: loop through tasks and create task cards for each status 
+        // Example: 
+          for (let task of taskList) {
+        if (task.status === 'todo') {
+            console.log(`${task.title} ${task.status} will be appended to Todo`);
+            todoList.append(createTaskCard(task));
+            console.log(`${task.title} ${task.status} IS NOW IN Todo`);
+          } else if (task.status === 'in-progress') {
+            console.log(`${task.title} ${task.status} will be appended to InProgress`);
+            inProgressList.append(createTaskCard(task));
+            console.log(`${task.title} ${task.status} IS NOW IN InProgress`);
+          } else if (task.status === 'done') {
+            console.log(`${task.title} ${task.status} will be appended to Done`);
+            console.log(`${task.title} ${task.status} IS NOW IN Done`);
+            doneList.append(createTaskCard(task));
+          }
+        }
+
+    // TODO: use JQuery UI to make task cards draggable
+        // Example: 
+        // $('.draggable').draggable({
+        // opacity: 0.7,
+        // zIndex: 100,
+        //     //function to clone the card being dragged so that the original card remains in place
+        // helper: function (e) {
+            
+        //     // check if the target of the drag event is the card itself or a child element. If it is the card itself, clone it, otherwise find the parent card  that is draggable and clone that.
+        //     const original = $(e.target).hasClass('ui-draggable')
+        //       ? $(e.target)
+        //       : $(e.target).closest('.ui-draggable');
+        //     //return the clone with the width set to the width of the original card. This is so the clone does not take up the entire width of the lane. This is to also fix a visual bug where the card shrinks as it's dragged to the right.
+        //     return original.clone().css({
+        //       width: original.outerWidth(),
+        //     });
+        //   },
+        // });
 }
 
 // Todo: create a function to handle adding a new task
@@ -180,8 +206,8 @@ function handleAddTask(event){
         console.log('taskList array with the new card data: ', taskList);
         localStorage.setItem("tasks", JSON.stringify(taskList));
 
-        // TODO: call renderTaskList() <--- no need
-
+        // TODO: call renderTaskList() 
+        // renderTaskList();
         // TODO: clear the form inputs 
             // Example: 
             // $('#idForTaskTitle').val('');
@@ -216,7 +242,7 @@ function handleDeleteTask(event){
         // Example: 
          localStorage.setItem('tasks', JSON.stringify(taskList));
     
-    // TODO: call renderTaskLIst() <--- no need because we remove the card using `.remove()`
+    // TODO: call renderTaskLIst() 
 }
 
 // Todo: create a function to handle dropping a task into a new status lane
@@ -225,16 +251,16 @@ function handleDrop(event, ui) {
     console.log('A card was dropped in a column');
     // TODO: get the task id and new status from the event
         // Example: 
-        const taskId = ui.draggable[0].dataset.projectId;
-        const newStatus = event.target.id;
+        // const taskId = ui.draggable[0].dataset.projectId;
+        // const newStatus = event.target.id;
 
     //TODO: write a for...of loop to update the task status of the dragged card 
         // Example: 
-        for (let task of taskList) {
-            if (task.id === taskId) {
-                task.status = newStatus;
-            }
-        }
+        // for (let task of taskList) {
+        //     if (task.id === taskId) {
+        //         task.status = newStatus;
+        //     }
+        // }
         console.log('taskList: ', taskList);
         // Get the card that was dragged and dropped
         // const taskId = ui.draggable[0].dataset.projectId; // <-- Teacher suggestion but I decided not to use data-set-projectid when the card was made in createTaskCard()
@@ -260,15 +286,18 @@ function handleDrop(event, ui) {
 
     //TODO: write a for...of loop to update the task status of the dragged card 
         // Example: 
-        // for (let task of taskList) {
-        //     if (task.id === draggableTaskCardId) {
-        //         task.status = droppaleColumnId;
-        //     }
-        // }
-
+        for (let task of taskList) {
+        //     console.log('typeof taskId: ', typeof task.id);
+        //     console.log('typeof draggableTaskCardId: ', typeof draggableTaskCardId);
+            if (task.id === parseInt(draggableTaskCardId)) {
+                console.log("got here")
+                task.status = droppaleColumnId;
+            }
+        }
+        console.log('new tasksList: ', taskList)
     // TODO: save to local storage 
         // Example: 
-        //  localStorage.setItem('tasks', JSON.stringify(taskList));
+         localStorage.setItem('tasks', JSON.stringify(taskList));
  
     // TODO: call renderTaskList()
 }
