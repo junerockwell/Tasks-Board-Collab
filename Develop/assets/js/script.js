@@ -19,7 +19,7 @@ function generateTaskId() {
 
     // TODO: save nextId to localStorage
     // Example: localStorage.setItem("variableName", JSON.stringify(variableName)); 
-    // localStorage.setItem("nextId", JSON.stringify(varnextIdiableName)); 
+    localStorage.setItem("nextId", JSON.stringify(nextId)); 
 
 
     // TODO: return nextId; 
@@ -72,30 +72,31 @@ function createTaskCard(task) {
 // Todo: create a function to render the task list and make cards draggable
 // WHAT IS THIS FUNCTION DOING? This function should render all the task cards in their respective lanes &&  make them draggable using jQuery UI
 function renderTaskList() {
+    console.log("renderTaskList()")
     // TODO: write an if/else statement where IF taskList is null, set it to an empty array
 
     // TODO: empty existing task cards   
         // Example: 
-        // const todoList = $('#todo-cards');
-        // todoList.empty();
+        const todoList = $('#todo-cards');
+        // todoList.empty(); // no need 
 
-        // const inProgressList = $('#in-progress-cards');
-        // inProgressList.empty();
+        const inProgressList = $('#in-progress-cards');
+        // inProgressList.empty(); // no need 
 
-        // const doneList = $('#done-cards');
-        // doneList.empty();
+        const doneList = $('#done-cards');
+        // doneList.empty(); // no need 
 
     // TODO: loop through tasks and create task cards for each status 
         // Example: 
-        //   for (let project of projects) {
-        // if (project.status === 'to-do') {
-        //     todoList.append(createProjectCard(project));
-        //   } else if (project.status === 'in-progress') {
-        //     inProgressList.append(createProjectCard(project));
-        //   } else if (project.status === 'done') {
-        //     doneList.append(createProjectCard(project));
-        //   }
-        // }
+          for (let task of taskList) {
+        if (task.status === 'todo') {
+            todoList.append(createTaskCard(task));
+          } else if (project.status === 'in-progress') {
+            inProgressList.append(createTaskCard(task));
+          } else if (project.status === 'done') {
+            doneList.append(createTaskCard(task));
+          }
+        }
 
     // TODO: use JQuery UI to make task cards draggable
         // Example: 
@@ -143,7 +144,7 @@ function handleAddTask(event){
             title: taskTitle,
             description: taskDescription,
             dueDate: taskDueDate,
-            status: 'to-do'
+            status: 'todo'
         }; 
         console.log('task data put together is: ', task);
 
@@ -154,8 +155,14 @@ function handleAddTask(event){
         // const projects = [];
         
         // TODO: save to local storage 
+        if (taskList === null) {
+            taskList = [];
+        }
+        taskList.push(task);
+        console.log('taskList array with the new card data: ', taskList);
+        localStorage.setItem("tasks", JSON.stringify(taskList));
 
-        // TODO: call renderTaskList() 
+        // TODO: call renderTaskList() <--- no need
 
         // TODO: clear the form inputs 
             // Example: 
@@ -172,46 +179,49 @@ function handleDeleteTask(event){
 
     // TODO: get the task id from the button clicked 
         // Example: 
-        const projectId = $(this).attr('id'); //1, 2, 100
-        console.log('projectId: ' + projectId); // 'projectId: 1' in the console log
+        const cardId = $(this).attr('id'); //1, 2, 100
+        console.log('cardId: ' + cardId); // 'projectId: 1' in the console log
        
-        const projectIdHash ='#' + projectId;
-        console.log('projectIdHash: ' + projectIdHash); // '# 1'
+        const cardIdHash ='#' + cardId;
+        console.log('cardIdHash: ' + cardIdHash); // '# 1'
         // console.log(`projectID with hashtag: `)
-        $(projectIdHash).remove(); // removing id="1" or "#1"
+        $(cardIdHash).remove(); // removing id="1" or "#1"
 
 
 
     // TODO: remove the task from the taskList using the filter (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) method
         // Example: 
-        // projectList = projectList.filter((project) => project.id !== parseInt(projectId));  
+        taskList = taskList.filter((task) => task.id !== parseInt(cardId));  
+        console.log('taskList: ', taskList);
 
     // TODO: save to local storage 
         // Example: 
-        //  localStorage.setItem('projects', JSON.stringify(projects));
+         localStorage.setItem('tasks', JSON.stringify(taskList));
     
-    // TODO: call renderTaskLIst() 
+    // TODO: call renderTaskLIst() <--- no need because we remove the card using `.remove()`
 }
 
 // Todo: create a function to handle dropping a task into a new status lane
 // WHAT IS THIS FUNCTION DOING? This function should handle changing the status of a task when it is dropped into a new lane.
 function handleDrop(event, ui) {
+    console.log('A card was dropped in a column');
     // TODO: get the task id and new status from the event
         // Example: 
-        // const taskId = ui.draggable[0].dataset.projectId;
-        // const newStatus = event.target.id;
+        const taskId = ui.draggable[0].dataset.projectId;
+        const newStatus = event.target.id;
 
     //TODO: write a for...of loop to update the task status of the dragged card 
         // Example: 
-        // for (let project of projects) {
-        // if (project.id === taskId) {
-        //     project.status = newStatus;
-        //   }
-        // }
+        for (let task of taskList) {
+            if (task.id === taskId) {
+                task.status = newStatus;
+            }
+        }
+        console.log('taskList: ', taskList);
 
     // TODO: save to local storage 
         // Example: 
-        //  localStorage.setItem('projects', JSON.stringify(projects));
+        //  localStorage.setItem('tasks', JSON.stringify(taskList));
  
     // TODO: call renderTaskList()
 }
@@ -221,7 +231,8 @@ $(document).ready(function () {
     console.log('document should be ready');
     // HINT: Module 5, Mini Project SOLVED, script.js, lines 201-215
     // TODO: render the task list 
-    
+    renderTaskList();
+
     // TODO: add event listener 
     $("#create-task-form").submit(function(event) {
         console.log('The Enter button was clicked');
@@ -230,7 +241,7 @@ $(document).ready(function () {
     });
     // TODO: make lanes droppable 
 
-    // TODO: make due date field a date picker
+    console.log('taskList: ', taskList)
 
     
 
