@@ -122,7 +122,7 @@ function handleAddTask(event){
     console.log('got here inside the handleAddTask() function')
         // TODO: method to prevent default behavior of browser event
             // Example: 
-        // event.preventDefault(); 
+        event.preventDefault(); 
         
         // TODO: create a new task object
             // Example: 
@@ -223,10 +223,10 @@ $(document).ready(function () {
     // TODO: render the task list 
     
     // TODO: add event listener 
-    $("#add-task-btn").click(function() {
+    $("#formModal").submit(function(event) {
         console.log('The Enter button was clicked');
         console.log('About to call handleAddTask() function')
-        handleAddTask();
+        handleAddTask(event);
     });
     // TODO: make lanes droppable 
 
