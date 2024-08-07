@@ -34,7 +34,8 @@ function createTaskCard(task) {
         //Example: 
         const taskCard = $('<div>')
               .addClass('card project-card draggable my-3')
-              .attr('id', task.id);
+              .attr('id', task.id)
+              .attr('data-column', 'to-do');
         const cardHeader = $('<div>').addClass('card-header h4').text(task.title);
         const cardBody = $('<div>').addClass('card-body');
         const cardDescription = $('<p>').addClass('card-text').text(task.description);
@@ -72,6 +73,7 @@ function createTaskCard(task) {
 // Todo: create a function to render the task list and make cards draggable
 // WHAT IS THIS FUNCTION DOING? This function should render all the task cards in their respective lanes &&  make them draggable using jQuery UI
 function renderTaskList() {
+    console.log('renderTaskList()')
     // TODO: write an if/else statement where IF taskList is null, set it to an empty array
 
     // TODO: empty existing task cards   
@@ -99,21 +101,32 @@ function renderTaskList() {
 
     // TODO: use JQuery UI to make task cards draggable
         // Example: 
-        // $('.draggable').draggable({
-        // opacity: 0.7,
-        // zIndex: 100,
-            // function to clone the card being dragged so that the original card remains in place
-        // helper: function (e) {
+        $('.draggable').draggable({
+        opacity: 0.7,
+        zIndex: 100,
+        // snap: true,
+        // start: function() {
+        //     console.log('start')
+        // },
+        // stop: function() {
+        //     console.log('stop')
+        // },
+        // drag: function() {
+        //     console.log('drag');
+        // },
+            //function to clone the card being dragged so that the original card remains in place
+        helper: function (e) {
+            
             // check if the target of the drag event is the card itself or a child element. If it is the card itself, clone it, otherwise find the parent card  that is draggable and clone that.
-            // const original = $(e.target).hasClass('ui-draggable')
-            //   ? $(e.target)
-            //   : $(e.target).closest('.ui-draggable');
-            // return the clone with the width set to the width of the original card. This is so the clone does not take up the entire width of the lane. This is to also fix a visual bug where the card shrinks as it's dragged to the right.
-        //     return original.clone().css({
-        //       width: original.outerWidth(),
-        //     });
-        //   },
-        // });
+            const original = $(e.target).hasClass('ui-draggable')
+              ? $(e.target)
+              : $(e.target).closest('.ui-draggable');
+            //return the clone with the width set to the width of the original card. This is so the clone does not take up the entire width of the lane. This is to also fix a visual bug where the card shrinks as it's dragged to the right.
+            return original.clone().css({
+              width: original.outerWidth(),
+            });
+          },
+        });
 }
 
 // Todo: create a function to handle adding a new task
@@ -156,6 +169,7 @@ function handleAddTask(event){
         // TODO: save to local storage 
 
         // TODO: call renderTaskList() 
+        renderTaskList();
 
         // TODO: clear the form inputs 
             // Example: 
@@ -198,15 +212,34 @@ function handleDeleteTask(event){
 function handleDrop(event, ui) {
     // TODO: get the task id and new status from the event
         // Example: 
-        // const taskId = ui.draggable[0].dataset.projectId;
-        // const newStatus = event.target.id;
+        // Get the card that was dragged and dropped
+        // const taskId = ui.draggable[0].dataset.projectId; // <-- Teacher suggestion but I decided not to use data-set-projectid when the card was made in createTaskCard()
+        const draggableTaskCardId = ui.draggable.attr("id");
+        console.log('draggableTaskCardId: ', draggableTaskCardId);
+        
+        // Get the column id that the card was dropped to.
+        const droppaleColumnId = event.target.id;
+        console.log('droppaleColumnId: ', droppaleColumnId);
+        // It just so happens that the droppableColumnId can be
+        // used as the status text needed to be saved in 
+        // localStorage
+        console.log('newStatus: ', droppaleColumnId);
+        
+        // Using jQuery to get the specific card element by it's id
+        const droppedElement = $(`#${draggableTaskCardId}`); 
+        // Appending the dropped card element to the column element
+        // will remove it from the previous column to the
+        // dropped column
+        droppedElement.appendTo(`#${droppaleColumnId}-cards`);
+        // Update the column that the card is now in
+        droppedElement.attr('data-column', droppaleColumnId); // Do we still need this?
 
     //TODO: write a for...of loop to update the task status of the dragged card 
         // Example: 
-        // for (let project of projects) {
-        // if (project.id === taskId) {
-        //     project.status = newStatus;
-        //   }
+        // for (let task of taskList) {
+        //     if (task.id === draggableTaskCardId) {
+        //         task.status = droppaleColumnId;
+        //     }
         // }
 
     // TODO: save to local storage 
@@ -221,17 +254,51 @@ $(document).ready(function () {
     console.log('document should be ready');
     // HINT: Module 5, Mini Project SOLVED, script.js, lines 201-215
     // TODO: render the task list 
-    
+    renderTaskList();
+
     // TODO: add event listener 
     $("#create-task-form").submit(function(event) {
         console.log('The Enter button was clicked');
         console.log('About to call handleAddTask() function')
         handleAddTask(event);
     });
-    // TODO: make lanes droppable 
-
-    // TODO: make due date field a date picker
 
     
+    // TODO: make lanes droppable 
+    $("#todo").droppable({
+        classes: {
+          "ui-droppable-active": "ui-state-active",
+          "ui-droppable-hover": "ui-state-hover"
+        },
+        drop: function( event, ui ) {
+            console.log('the card data that was just dropped: ', ui);
+            handleDrop(event, ui);
+        }
+      });
 
+      $( "#in-progress" ).droppable({
+        drop: function(event, ui) {
+        //   console.log('event.target: ', event.target);
+          console.log('the card data that was just dropped: ', ui);
+          handleDrop(event, ui);
+        //   const draggableId = ui.draggable.attr("id");
+        //   console.log('draggableId: ', draggableId); // Get the card that was dragged and dropped
+        //   const droppableId = $(this).attr("id");
+        //   console.log('droppableId: ', droppableId);
+        //   const droppedElement = $(`#${draggableId}`); // Get the column id that the card was dropped to.
+        //   droppedElement.appendTo("#in-progress-cards");
+        //   droppedElement.attr('data-column', 'in-progress'); // Update the column that the card is now in
+        }
+      });
+
+      $("#done").droppable({
+        classes: {
+          "ui-droppable-active": "ui-state-active",
+          "ui-droppable-hover": "ui-state-hover"
+        },
+        drop: function( event, ui ) {
+            console.log('the card data that was just dropped: ', ui);
+          handleDrop(event, ui);
+        }
+      });
 });
