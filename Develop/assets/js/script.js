@@ -223,7 +223,7 @@ $(document).ready(function () {
     // TODO: render the task list 
     
     // TODO: add event listener 
-    $("#formModal").submit(function(event) {
+    $("#create-task-form").submit(function(event) {
         console.log('The Enter button was clicked');
         console.log('About to call handleAddTask() function')
         handleAddTask(event);
